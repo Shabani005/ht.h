@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <assert.h>
  
-#define NUM 4
-
-// maybe add kv's to this struct
 typedef struct{
   char**  value;
   size_t* len;
@@ -77,7 +74,6 @@ void hash_append(nb_ht* t, char* value){
   t->count++;
 }
 
-
 void nb_string_append(nb_Strings* s, char* value){
   if (s->capacity == 0) {
     s->capacity = 256;
@@ -95,7 +91,6 @@ void nb_string_append(nb_Strings* s, char* value){
   s->count++;
 }
 
-
 int main(void){
   nb_ht ht = {0};
   hash_append(&ht, "hello");
@@ -107,17 +102,3 @@ int main(void){
 
   return 0;
 }
-
-
-
-
-
-
-// int main2(void){
-//   nb_Strings strings = {0};
-//   char* words[NUM] = {"hello", "world", "foo", "bar"};
-//   for (size_t i=0; i<NUM; ++i){
-//    nb_string_append(&strings, words[i]);
-//    printf("hash: %d\n", hash(strings.value[i], strings.len[i]));
-//   }  
-// }
