@@ -1,6 +1,5 @@
+#include <stdlib.h>
 #include <stdbool.h>
-#define NB_IMPLEMENTATION
-#include "nb.h"
 #include <stdint.h>
 #include <assert.h>
  
@@ -9,28 +8,26 @@ typedef struct{
   size_t* len;
   size_t  count;
   size_t  capacity;
-} nb_Strings;
+} ht_Strings;
 
 typedef struct{
   char**    value;
   uint32_t* hash;
   size_t    count;
   size_t    capacity; 
-} nb_ht;
+} ht_table;
 
+
+
+uint32_t ht_hash(const char* input, size_t size);
+size_t   ht_hash_index(ht_table *t, const char *value);
+void     ht_hash_append(ht_table *t, const char *value);
+void     ht_string_append(ht_Strings* s, char* value);
 
 #define TABLE_SIZE 1024
 
-// hashes may collide if sum of "string"[i] of two different
-// strings are different
-// if two collide we try to give it a value of hash +=1
-// if we later index using a string and the initial indexing gives a different one
-// we linearly search hash+=1 until we find the actual value
-// O(1) best case idk what complexity worst case is
-// the same strings will always return the same value
-// thus after hashing we can use it to index. 
-
-uint32_t hash(const char* input, size_t size){
+#ifdef HT_IMPLEMENTATION
+uint32_t ht_hash(const char* input, size_t size){
   uint32_t total = 0;
   for (size_t i=0; i<size; ++i){
     total+= (uint32_t)input[i];
@@ -38,8 +35,8 @@ uint32_t hash(const char* input, size_t size){
   return total;
 }
 
-size_t  hash_index(nb_ht *t, const char *value) {
-    uint32_t hashv = hash(value, strlen(value));
+size_t  ht_hash_index(ht_table *t, const char *value) {
+    uint32_t hashv = ht_hash(value, strlen(value));
     uint32_t start = hashv; // to detect full table loop
 
     while (t->value[hashv] != NULL) {
@@ -64,7 +61,7 @@ size_t  hash_index(nb_ht *t, const char *value) {
     return hashv;
 }
 
-void hash_append(nb_ht *t, const char *value) {
+void ht_hash_append(ht_table *t, const char *value) {
     if (t->capacity == 0) {
         t->capacity = 10000;
         t->count = 0;
@@ -83,7 +80,7 @@ void hash_append(nb_ht *t, const char *value) {
     }
 
     uint32_t hashv =
-        hash(value, strlen(value)) % t->capacity; 
+        ht_hash(value, strlen(value)) % t->capacity; 
     uint32_t start = hashv;                       
 
     while (t->value[hashv] != NULL) {
@@ -106,7 +103,7 @@ void hash_append(nb_ht *t, const char *value) {
 }
 
 
-void nb_string_append(nb_Strings* s, char* value){
+void ht_string_append(ht_Strings* s, char* value){
   if (s->capacity == 0) {
     s->capacity = 256;
     s->count = 0;
@@ -122,14 +119,4 @@ void nb_string_append(nb_Strings* s, char* value){
   s->len[s->count] = strlen(buf); // this may not work
   s->count++;
 }
-
-int main(void){
-  nb_ht ht = {0};
-  hash_append(&ht, "hello");
-  hash_append(&ht, "ifmmk");
-  // hash_append(&ht, "hello");
-
-  printf("%zu\n", hash_index(&ht, "ifmmk"));
-  printf("%zu\n", hash_index(&ht, "hello"));
-  return 0;
-}
+#endif
