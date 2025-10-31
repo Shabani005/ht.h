@@ -1,6 +1,6 @@
 hash table implemented in c (recreational programming project)
 
--quickstart (build example)
+- quickstart (build example)
 ```bash
   cc -o builder builder.c
   ./builder
